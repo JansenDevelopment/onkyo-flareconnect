@@ -1,6 +1,7 @@
 """Onkyo FlareConnect: multiroom-groepen lezen en zetten vanuit Home Assistant."""
 from __future__ import annotations
 
+import asyncio
 import logging
 import random
 
@@ -12,17 +13,21 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 
 from .const import (
+    ATTR_COMMANDS,
+    ATTR_DELAY,
     ATTR_GROUP_ID,
+    ATTR_HOST,
     ATTR_MAX_DELAY,
     ATTR_MEMBERS,
     ATTR_SOURCE,
     CONF_HOSTS,
     DOMAIN,
     SERVICE_JOIN,
+    SERVICE_SEND_COMMAND,
     SERVICE_UNJOIN,
 )
 from .coordinator import FlareConnectCoordinator
-from .eiscp import async_clear_group, async_set_group
+from .eiscp import async_clear_group, async_send_raw, async_set_group
 
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR]
@@ -36,6 +41,13 @@ JOIN_SCHEMA = vol.Schema(
     }
 )
 UNJOIN_SCHEMA = vol.Schema({vol.Required(ATTR_SOURCE): cv.string})
+SEND_COMMAND_SCHEMA = vol.Schema(
+    {
+        vol.Required(ATTR_HOST): cv.string,
+        vol.Required(ATTR_COMMANDS): vol.All(cv.ensure_list, [cv.string]),
+        vol.Optional(ATTR_DELAY, default=2.0): vol.All(vol.Coerce(float), vol.Range(min=0, max=30)),
+    }
+)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -57,6 +69,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if not hass.data[DOMAIN]:
             hass.services.async_remove(DOMAIN, SERVICE_JOIN)
             hass.services.async_remove(DOMAIN, SERVICE_UNJOIN)
+            hass.services.async_remove(DOMAIN, SERVICE_SEND_COMMAND)
     return ontladen
 
 
@@ -107,5 +120,23 @@ def _register_services(hass: HomeAssistant) -> None:
         _LOGGER.info("Groep verbroken vanaf %s", bron)
         await coordinator.async_request_refresh()
 
+    async def _send_command(call: ServiceCall) -> None:
+        """Stuur ruwe eISCP-commando's op een rij, met pauze ertussen.
+
+        Menucommando's (NSV, NLSI) zijn stateful: het toestel moet tijd krijgen om de
+        volgende lijst op te bouwen voordat het volgende commando aankomt.
+        """
+        coordinator = _coordinator()
+        host = _resolve(coordinator, call.data[ATTR_HOST])
+        pauze = call.data[ATTR_DELAY]
+        for i, commando in enumerate(call.data[ATTR_COMMANDS]):
+            if i:
+                await asyncio.sleep(pauze)
+            _LOGGER.debug("Naar %s: %s", host, commando)
+            await async_send_raw(host, commando)
+
     hass.services.async_register(DOMAIN, SERVICE_JOIN, _join, schema=JOIN_SCHEMA)
     hass.services.async_register(DOMAIN, SERVICE_UNJOIN, _unjoin, schema=UNJOIN_SCHEMA)
+    hass.services.async_register(
+        DOMAIN, SERVICE_SEND_COMMAND, _send_command, schema=SEND_COMMAND_SCHEMA
+    )

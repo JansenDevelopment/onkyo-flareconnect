@@ -32,3 +32,25 @@ unjoin:
       example: 192.168.1.10
       selector:
         text:
+
+send_command:
+  fields:
+    host:
+      required: true
+      example: 192.168.1.10
+      selector:
+        text:
+    commands:
+      required: true
+      example: '["SLI2B", "NSV0E0", "NLSI00001"]'
+      selector:
+        object:
+    delay:
+      required: false
+      default: 2
+      selector:
+        number:
+          min: 0
+          max: 30
+          step: 0.5
+          unit_of_measurement: s

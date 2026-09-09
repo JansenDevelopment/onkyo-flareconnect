@@ -59,6 +59,15 @@ integration mirrors.
 Group changes are **not pushed** over eISCP — not to the app, not to any other connection — so
 state has to be polled.
 
+## A note on polling
+
+Onkyo devices accept **only one eISCP connection at a time**. Every connection this integration
+opens knocks the official `onkyo` integration off its persistent connection, which shows up as
+`Disconnect detected` warnings and flickering media info. Group state only changes when someone
+actually groups or ungroups, so this integration polls every **5 minutes** and refreshes
+immediately after its own `join` / `unjoin`. Lowering that interval will make the media entities
+of the built-in integration unstable.
+
 ## Installation
 
 ### HACS

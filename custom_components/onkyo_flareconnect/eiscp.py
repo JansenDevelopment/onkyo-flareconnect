@@ -158,6 +158,11 @@ async def async_set_group(
     await _request(host, "MGV200", read_seconds=0.5)
 
 
+async def async_send_raw(host: str, message: str, read_seconds: float = 1.0) -> str:
+    """Stuur een willekeurig ISCP-commando (zonder de !1-prefix) en geef het antwoord terug."""
+    return await _request(host, message, read_seconds=read_seconds)
+
+
 async def async_clear_group(host: str, zone: int = 1) -> None:
     """Verbreek de groep waarvan host de bron is."""
     payload = '<mgs zone="%d"><groupid>0</groupid></mgs>' % zone
