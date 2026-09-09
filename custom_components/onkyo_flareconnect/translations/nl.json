@@ -78,6 +78,10 @@
           "description": "Seconden tussen de commando's."
         }
       }
+    },
+    "refresh": {
+      "name": "Verversen",
+      "description": "Leest de groepsstatus opnieuw uit. Nodig na koppelen buiten Home Assistant om, want de integratie pollt niet op de achtergrond."
     }
   }
 }

@@ -4,16 +4,20 @@ DOMAIN = "onkyo_flareconnect"
 
 CONF_HOSTS = "hosts"
 
-# Onkyo-toestellen accepteren maar EEN eISCP-verbinding tegelijk. Elke keer dat wij er een
-# openen, verliest de officiele onkyo-integratie de hare en herverbindt hij - wat zichtbaar is
-# als knipperende media-info. Groepen veranderen alleen als iemand ze wijzigt, dus poll rustig;
-# na onze eigen join/unjoin verversen we sowieso meteen.
-DEFAULT_SCAN_INTERVAL = 300  # seconden
+# BEWUST GEEN PERIODIEKE POLLING.
+# De officiele onkyo-integratie houdt een eISCP-verbinding open waarover de toestellen hun
+# statuswijzigingen pushen (volume, aan/uit, bron). Openen wij daarnaast een verbinding, dan
+# verliest zij de hare, mist ze pushberichten en moet ze bij het herverbinden de hele staat
+# opnieuw opvragen - zichtbaar als knipperende media-info.
+# Groepen veranderen alleen als iemand ze wijzigt, dus we verversen bij het opstarten, na onze
+# eigen join/unjoin, en verder alleen als erom gevraagd wordt (service `refresh`).
+SCAN_INTERVAL = None
 
 # Services
 SERVICE_JOIN = "join"
 SERVICE_UNJOIN = "unjoin"
 SERVICE_SEND_COMMAND = "send_command"
+SERVICE_REFRESH = "refresh"
 
 ATTR_SOURCE = "source"
 ATTR_MEMBERS = "members"

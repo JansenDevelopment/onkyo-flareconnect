@@ -54,3 +54,6 @@ send_command:
           max: 30
           step: 0.5
           unit_of_measurement: s
+
+refresh:
+  fields: {}

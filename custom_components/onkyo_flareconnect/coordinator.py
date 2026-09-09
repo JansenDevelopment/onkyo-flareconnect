@@ -3,26 +3,28 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import timedelta
-
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
+from .const import DOMAIN, SCAN_INTERVAL
 from .eiscp import DeviceInfo, async_get_device_info
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class FlareConnectCoordinator(DataUpdateCoordinator[dict[str, DeviceInfo]]):
-    """Pollt MDI op elk toestel; groepswijzigingen worden namelijk niet gepusht."""
+    """Leest MDI op elk toestel.
+
+    Groepswijzigingen worden niet gepusht, dus dit moet actief opgevraagd worden - maar we doen
+    dat alleen op verzoek, niet periodiek. Zie de toelichting bij SCAN_INTERVAL in const.py.
+    """
 
     def __init__(self, hass: HomeAssistant, hosts: list[str]) -> None:
         super().__init__(
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=DEFAULT_SCAN_INTERVAL),
+            update_interval=SCAN_INTERVAL,
         )
         self.hosts = hosts
 

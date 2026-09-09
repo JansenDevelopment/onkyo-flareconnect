@@ -78,6 +78,10 @@
           "description": "Seconds between commands."
         }
       }
+    },
+    "refresh": {
+      "name": "Refresh",
+      "description": "Re-reads the group state. Needed after grouping outside Home Assistant, since the integration does not poll in the background."
     }
   }
 }

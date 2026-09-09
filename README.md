@@ -59,14 +59,18 @@ integration mirrors.
 Group changes are **not pushed** over eISCP — not to the app, not to any other connection — so
 state has to be polled.
 
-## A note on polling
+## Why this integration does not poll
 
-Onkyo devices accept **only one eISCP connection at a time**. Every connection this integration
-opens knocks the official `onkyo` integration off its persistent connection, which shows up as
-`Disconnect detected` warnings and flickering media info. Group state only changes when someone
-actually groups or ungroups, so this integration polls every **5 minutes** and refreshes
-immediately after its own `join` / `unjoin`. Lowering that interval will make the media entities
-of the built-in integration unstable.
+The built-in `onkyo` integration keeps a persistent eISCP connection open, and the receivers
+push their state over it — volume, power, source. Opening a second connection knocks that one
+off: the built-in integration then misses those pushes and has to re-query everything when it
+reconnects, which shows up as `Disconnect detected` warnings and flickering media info. Measured
+here: 95 disconnects in a single evening while polling every 15 seconds.
+
+So this integration does **not** poll in the background. It reads group state on startup, right
+after its own `join` / `unjoin`, and whenever you call `onkyo_flareconnect.refresh`. Group state
+only changes when someone groups or ungroups anyway — the only case it can miss is grouping done
+from the vendor app, and a `refresh` picks that up.
 
 ## Installation
 

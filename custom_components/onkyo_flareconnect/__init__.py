@@ -23,6 +23,7 @@ from .const import (
     CONF_HOSTS,
     DOMAIN,
     SERVICE_JOIN,
+    SERVICE_REFRESH,
     SERVICE_SEND_COMMAND,
     SERVICE_UNJOIN,
 )
@@ -70,6 +71,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hass.services.async_remove(DOMAIN, SERVICE_JOIN)
             hass.services.async_remove(DOMAIN, SERVICE_UNJOIN)
             hass.services.async_remove(DOMAIN, SERVICE_SEND_COMMAND)
+            hass.services.async_remove(DOMAIN, SERVICE_REFRESH)
     return ontladen
 
 
@@ -137,6 +139,11 @@ def _register_services(hass: HomeAssistant) -> None:
 
     hass.services.async_register(DOMAIN, SERVICE_JOIN, _join, schema=JOIN_SCHEMA)
     hass.services.async_register(DOMAIN, SERVICE_UNJOIN, _unjoin, schema=UNJOIN_SCHEMA)
+    async def _refresh(call: ServiceCall) -> None:
+        """Lees de groepsstatus opnieuw uit. Nodig na koppelen buiten Home Assistant om."""
+        await _coordinator().async_refresh()
+
     hass.services.async_register(
         DOMAIN, SERVICE_SEND_COMMAND, _send_command, schema=SEND_COMMAND_SCHEMA
     )
+    hass.services.async_register(DOMAIN, SERVICE_REFRESH, _refresh, schema=vol.Schema({}))
