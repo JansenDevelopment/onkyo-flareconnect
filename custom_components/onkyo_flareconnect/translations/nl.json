@@ -1,0 +1,44 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Onkyo FlareConnect",
+        "description": "Gevonden toestellen staan al ingevuld. Meerdere adressen scheid je met een komma.",
+        "data": { "hosts": "IP-adressen" }
+      }
+    },
+    "error": { "cannot_connect": "Geen van de opgegeven adressen antwoordde op eISCP." },
+    "abort": { "already_configured": "Onkyo FlareConnect is al ingesteld." }
+  },
+  "entity": {
+    "sensor": {
+      "group_role": {
+        "name": "FlareConnect-groep",
+        "state": {
+          "source": "Bron",
+          "receiver": "Ontvanger",
+          "not_grouped": "Niet gekoppeld"
+        }
+      }
+    }
+  },
+  "services": {
+    "join": {
+      "name": "Koppelen",
+      "description": "Maakt een FlareConnect-groep aan. Het commando gaat naar de bron; die stuurt de leden zelf aan.",
+      "fields": {
+        "source": { "name": "Bron", "description": "IP-adres of device-id van het toestel dat de muziek levert." },
+        "members": { "name": "Leden", "description": "IP-adressen of device-id's die met de bron meespelen." },
+        "group_id": { "name": "Groepsnummer", "description": "Leeg laten om er zelf een te kiezen." },
+        "max_delay": { "name": "Maximale vertraging", "description": "Audiovertraging in milliseconden; de app gebruikt 5000." }
+      }
+    },
+    "unjoin": {
+      "name": "Ontkoppelen",
+      "description": "Verbreekt de groep waarvan het opgegeven toestel de bron is.",
+      "fields": {
+        "source": { "name": "Bron", "description": "IP-adres of device-id van de bron van de groep." }
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Onkyo FlareConnect",
+        "description": "Discovered devices are prefilled. Separate multiple addresses with a comma.",
+        "data": { "hosts": "IP addresses" }
+      }
+    },
+    "error": { "cannot_connect": "None of the given addresses answered on eISCP." },
+    "abort": { "already_configured": "Onkyo FlareConnect is already configured." }
+  },
+  "entity": {
+    "sensor": {
+      "group_role": {
+        "name": "FlareConnect group",
+        "state": {
+          "source": "Source",
+          "receiver": "Receiver",
+          "not_grouped": "Not grouped"
+        }
+      }
+    }
+  },
+  "services": {
+    "join": {
+      "name": "Join",
+      "description": "Creates a FlareConnect group. The command goes to the master, which drives the members itself.",
+      "fields": {
+        "source": { "name": "Master", "description": "IP address or device id of the device providing the audio." },
+        "members": { "name": "Members", "description": "IP addresses or device ids that follow the master." },
+        "group_id": { "name": "Group number", "description": "Leave empty to pick one automatically." },
+        "max_delay": { "name": "Maximum delay", "description": "Audio delay in milliseconds; the app uses 5000." }
+      }
+    },
+    "unjoin": {
+      "name": "Unjoin",
+      "description": "Breaks up the group that the given device is the master of.",
+      "fields": {
+        "source": { "name": "Master", "description": "IP address or device id of the group master." }
+      }
+    }
+  }
+}

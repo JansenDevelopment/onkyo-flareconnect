@@ -1,0 +1,34 @@
+join:
+  fields:
+    source:
+      required: true
+      example: 192.168.1.10
+      selector:
+        text:
+    members:
+      required: true
+      example: "[192.168.1.11]"
+      selector:
+        object:
+    group_id:
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 255
+    max_delay:
+      required: false
+      default: 5000
+      selector:
+        number:
+          min: 0
+          max: 10000
+          unit_of_measurement: ms
+
+unjoin:
+  fields:
+    source:
+      required: true
+      example: 192.168.1.10
+      selector:
+        text:
